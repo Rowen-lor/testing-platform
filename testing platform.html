@@ -114,11 +114,14 @@
             background: white;
             padding: 1.5rem 2rem;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 2rem;
             display: flex;
             align-items: center;
             gap: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 999;
         }
 
         .model-selector {
@@ -854,58 +857,7 @@
             </div>
         </div>
 
-        <!-- History Module -->
-        <div class="history-module">
-            <div class="history-header">
-                <h2>📖 Translation History</h2>
-                <div class="history-controls">
-                    <button class="btn btn-secondary" onclick="refreshHistory()">🔄 Refresh</button>
-                    <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Clear</button>
-                </div>
-            </div>
-            <div class="history-content">
-                <div class="history-tabs">
-                    <button class="history-tab-btn active" onclick="switchHistoryTab('recent')">Recent</button>
-                    <button class="history-tab-btn" onclick="switchHistoryTab('failed')">Failed</button>
-                    <button class="history-tab-btn" onclick="switchHistoryTab('all')">All</button>
-                </div>
-                <div class="history-list" id="historyList">
-                    <div class="history-item current" onclick="selectHistoryItem('current')">
-                        <div class="history-item-header">
-                            <span class="history-badge current">Current</span>
-                            <span class="history-time">2024-01-15 14:30:22</span>
-                        </div>
-                        <div class="history-item-content">
-                            <p class="history-request">Request ID: REQ-2024-001</p>
-                            <p class="history-preview">Hello world! This is a test translation. → ¡Hola mundo! Esta es una traducción de prueba.</p>
-                        </div>
-                    </div>
-                    <div class="history-item failed" onclick="selectHistoryItem('attempt2')">
-                        <div class="history-item-header">
-                            <span class="history-badge failed">Failed</span>
-                            <span class="history-time">2024-01-15 14:28:15</span>
-                        </div>
-                        <div class="history-item-content">
-                            <p class="history-request">Request ID: REQ-2024-001</p>
-                            <p class="history-preview">Hello world! This is a test translation. → Error: Translation failed due to context parsing issue.</p>
-                        </div>
-                    </div>
-                    <div class="history-item failed" onclick="selectHistoryItem('attempt1')">
-                        <div class="history-item-header">
-                            <span class="history-badge failed">Failed</span>
-                            <span class="history-time">2024-01-15 14:25:43</span>
-                        </div>
-                        <div class="history-item-content">
-                            <p class="history-request">Request ID: REQ-2024-001</p>
-                            <p class="history-preview">Hello world! This is a test translation. → Error: Model timeout occurred.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Results Section -->
-
         <div class="results-section">
             <div class="results-header">
                 <h2>📊 Translation Results</h2>
@@ -936,6 +888,27 @@
                         <h3>No details available</h3>
                         <p>Translation metadata and details will appear here.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Module -->
+        <div class="history-module">
+            <div class="history-header">
+                <h2>📖 Translation History</h2>
+                <div class="history-controls">
+                    <button class="btn btn-secondary" onclick="refreshHistory()">🔄 Refresh</button>
+                    <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Clear</button>
+                </div>
+            </div>
+            <div class="history-content">
+                <div class="history-tabs">
+                    <button class="history-tab-btn active" onclick="switchHistoryTab('recent')">Recent</button>
+                    <button class="history-tab-btn" onclick="switchHistoryTab('failed')">Failed</button>
+                    <button class="history-tab-btn" onclick="switchHistoryTab('all')">All</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- History items are dynamically generated by JavaScript -->
                 </div>
             </div>
         </div>
