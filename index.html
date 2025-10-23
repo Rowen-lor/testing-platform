@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公司内部翻译工具</title>
+    <title>AI翻译</title>
     <style>
         /* --- 全局样式 --- */
         body {
@@ -30,14 +30,6 @@
             box-sizing: border-box;
         }
 
-        h1 {
-            text-align: center;
-            color: #343a40;
-            margin-top: 0;
-            margin-bottom: 24px;
-            font-size: 24px;
-        }
-
         /* --- 顶部配置区 --- */
         .top-controls {
             display: flex;
@@ -60,6 +52,13 @@
             border-radius: 4px;
             font-size: 16px;
             background-color: #fff;
+            -webkit-appearance: none; /* 移除默认箭头 */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23495057%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: .65em auto;
         }
 
         /* --- 语言选择区 --- */
@@ -71,6 +70,7 @@
         }
         .language-select {
             flex: 1;
+            position: relative; /* 为多选下拉框定位 */
         }
         .swap-button {
             background: none;
@@ -105,11 +105,11 @@
             border: 1px solid #ced4da;
             border-radius: 4px;
             font-size: 16px;
-            resize: vertical; /* 允许用户垂直调整大小 */
+            resize: vertical;
             box-sizing: border-box;
         }
         #translation-output {
-            background-color: #f1f3f5; /* 给译文框一个不同的背景色 */
+            background-color: #f1f3f5;
         }
 
         /* --- 操作区 --- */
@@ -130,13 +130,81 @@
         .translate-button:hover {
             background-color: #0056b3;
         }
+
+        /* --- 新增：多选下拉框样式 --- */
+        .multi-select-container .select-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            user-select: none; /* 防止文本被选中 */
+        }
+        .multi-select-container .select-box .selected-options {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #495057;
+        }
+        .multi-select-container .select-box .placeholder {
+            color: #6c757d;
+        }
+        .multi-select-container .arrow {
+            width: 12px;
+            height: 12px;
+            border-left: 2px solid #495057;
+            border-bottom: 2px solid #495057;
+            transform: rotate(-45deg);
+            transition: transform 0.2s ease;
+            margin-left: 10px;
+        }
+        .multi-select-container.active .arrow {
+            transform: rotate(135deg);
+        }
+        .multi-select-container .checkbox-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .multi-select-container.active .checkbox-options {
+            display: block;
+        }
+        .multi-select-container .checkbox-options label {
+            display: block;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 0;
+            transition: background-color 0.2s;
+        }
+        .multi-select-container .checkbox-options label:hover {
+            background-color: #f1f3f5;
+        }
+        .multi-select-container .checkbox-options label input {
+            margin-right: 10px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
 
     <div class="translator-container">
-        <h1>公司内部翻译工具</h1>
-
         <!-- 顶部配置区 -->
         <div class="top-controls">
             <div class="control-group">
@@ -173,20 +241,28 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
             </button>
 
-            <div class="language-select">
-                <label for="target-lang">目标语言</label>
-                <select id="target-lang">
-                    <option value="en">英语</option>
-                    <option value="ja">日语</option>
-                    <option value="ko">韩语</option>
-                    <option value="fr">越南</option>
-                    <option value="de">泰语</option>
-                    <option value="es">印尼语</option>
-                    <option value="ru">俄语</option>
-                    <option value="it">意大利语</option>
-                    <option value="pt">葡萄牙语</option>
-                    <option value="ar">阿拉伯语</option>
-                </select>
+            <!-- 修改后的目标语言选择器 -->
+            <div class="language-select multi-select-container" id="target-lang-container">
+                <label for="target-lang-select-box">目标语言</label>
+                <div class="select-box" id="target-lang-select-box">
+                    <span class="selected-options placeholder">请选择...</span>
+                    <div class="arrow"></div>
+                </div>
+                <div class="checkbox-options">
+                    <label><input type="checkbox" value="en"> 英语</label>
+                    <label><input type="checkbox" value="ja"> 日语</label>
+                    <label><input type="checkbox" value="ko"> 韩语</label>
+                    <label><input type="checkbox" value="vi"> 越南语</label>
+                    <label><input type="checkbox" value="th"> 泰语</label>
+                    <label><input type="checkbox" value="id"> 印尼语</label>
+                    <label><input type="checkbox" value="ru"> 俄语</label>
+                    <label><input type="checkbox" value="it"> 意大利语</label>
+                    <label><input type="checkbox" value="pt"> 葡萄牙语</label>
+                    <label><input type="checkbox" value="de"> 德语</label>
+                    <label><input type="checkbox" value="fr"> 法语</label>
+                    <label><input type="checkbox" value="es"> 西班牙语</label>
+                    <label><input type="checkbox" value="ar"> 阿拉伯语</label>
+                </div>
             </div>
         </div>
 
@@ -204,9 +280,54 @@
     </div>
 
     <script>
-        // 这是一个纯前端界面模板。
-        // 实际的翻译功能、语言交换功能等需要编写 JavaScript 代码来与后端翻译API进行交互。
-        // 例如，点击“翻译”按钮时，获取所有输入框和选择框的值，发送给服务器，然后将返回的结果显示在右侧文本框中。
+        // --- 多选下拉框逻辑 ---
+        const container = document.getElementById('target-lang-container');
+        const selectBox = document.getElementById('target-lang-select-box');
+        const selectedOptionsSpan = selectBox.querySelector('.selected-options');
+        const checkboxes = container.querySelectorAll('.checkbox-options input[type="checkbox"]');
+
+        // 点击选择框时，展开/收起选项
+        selectBox.addEventListener('click', () => {
+            container.classList.toggle('active');
+        });
+
+        // 更新显示已选中的选项
+        function updateSelectedOptions() {
+            const selected = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    // 获取<label>的文本内容，并去除首尾空格
+                    const labelText = checkbox.parentElement.textContent.trim();
+                    selected.push(labelText);
+                }
+            });
+
+            if (selected.length === 0) {
+                selectedOptionsSpan.textContent = '请选择...';
+                selectedOptionsSpan.classList.add('placeholder');
+            } else if (selected.length <= 2) {
+                selectedOptionsSpan.textContent = selected.join(', ');
+                selectedOptionsSpan.classList.remove('placeholder');
+            } else {
+                selectedOptionsSpan.textContent = `已选择 ${selected.length} 种语言`;
+                selectedOptionsSpan.classList.remove('placeholder');
+            }
+        }
+
+        // 为每个复选框添加事件监听
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedOptions);
+        });
+
+        // 点击外部区域时，关闭下拉框
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                container.classList.remove('active');
+            }
+        });
+
+        // --- 其他功能的JS代码可以写在这里 ---
+        // 例如：翻译按钮点击事件、语言交换功能等
     </script>
 
 </body>
